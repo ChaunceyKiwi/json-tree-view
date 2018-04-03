@@ -1,106 +1,106 @@
 {
-	"name": "custom-view-samples",
-	"displayName": "Custom view Samples",
-	"description": "Samples for VSCode's view API",
-	"version": "0.0.1",
-	"publisher": "ms-vscode",
-	"engines": {
-		"vscode": "^1.20.0"
-	},
-	"enableProposedApi": true,
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onView:jsonOutline",
-		"onLanguage:json",
-		"onLanguage:jsonc"
-	],
-	"main": "./out/extension",
-	"contributes": {
-		"views": {
-			"explorer": [
-				{
-					"id": "jsonOutline",
-					"name": "Json Outline",
-					"when": "jsonOutlineEnabled"
-				}
-			]
-		},
-		"commands": [
-			{
-				"command": "jsonOutline.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "jsonOutline.refreshNode",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "jsonOutline.renameNode",
-				"title": "Rename"
-			},
-			{
-				"command": "extension.openJsonSelection",
-				"title": "Open JSON Selection"
-			}
-		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "jsonOutline.refresh",
-					"when": "view == jsonOutline",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "jsonOutline.renameNode",
-					"when": "view == jsonOutline"
-				},
-				{
-					"command": "jsonOutline.refreshNode",
-					"when": "view == jsonOutline",
-					"group": "inline"
-				}
-			]
-		},
-		"configuration": [
-			{
-				"title": "JSON Outline",
-				"properties": {
-					"jsonOutline.autorefresh": {
-						"type": "boolean",
-						"default": true
-					}
-				}
-			}
-		]
-	},
-	"scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-	},
-	"devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "tslint": "^5.8.0",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
-
-	},
-	"dependencies": {
-		"jsonc-parser": "^0.4.2"
-	}
+  "name": "custom-view-samples",
+  "displayName": "Custom view Samples",
+  "description": "Samples for VSCode's view API",
+  "version": "0.0.1",
+  "publisher": "ms-vscode",
+  "engines": {
+    "vscode": "^1.20.0"
+  },
+  "enableProposedApi": true,
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:jsonOutline",
+    "onLanguage:json",
+    "onLanguage:jsonc"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "jsonOutline",
+          "name": "Json Outline",
+          "when": "jsonOutlineEnabled"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "jsonOutline.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "jsonOutline.refreshNode",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "jsonOutline.renameNode",
+        "title": "Rename"
+      },
+      {
+        "command": "extension.openJsonSelection",
+        "title": "Open JSON Selection"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "jsonOutline.refresh",
+          "when": "view == jsonOutline",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "jsonOutline.renameNode",
+          "when": "view == jsonOutline"
+        },
+        {
+          "command": "jsonOutline.refreshNode",
+          "when": "view == jsonOutline",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "JSON Outline",
+        "properties": {
+          "jsonOutline.autorefresh": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.6",
+    "tslint": "^5.8.0",
+    "@types/node": "^7.0.43",
+    "@types/mocha": "^2.2.42"
+  },
+  "dependencies": {
+    "ajv": "^6.4.0",
+    "jsonc-parser": "^0.4.2"
+  }
 }

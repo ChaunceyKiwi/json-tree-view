@@ -3,6 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { JsonOutlineProvider } from './jsonOutline';
+import { validate } from './schema-validator';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -14,6 +15,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('jsonOutline.refreshNode', offset => jsonOutlineProvider.refresh(offset));
 	vscode.commands.registerCommand('jsonOutline.renameNode', offset => jsonOutlineProvider.rename(offset));
 	vscode.commands.registerCommand('extension.openJsonSelection', range => jsonOutlineProvider.select(range));
+
+	validate(JSON.parse(vscode.window.activeTextEditor.document.getText()));
 }
 
 // this method is called when your extension is deactivated
