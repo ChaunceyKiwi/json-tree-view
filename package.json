@@ -1,16 +1,12 @@
 {
-  "name": "custom-view-samples",
-  "displayName": "Custom view Samples",
-  "description": "Samples for VSCode's view API",
+  "name": "json-tree-view",
+  "displayName": "JSON Tree View",
+  "description": "Generate tree view from json file",
   "version": "0.0.1",
-  "publisher": "ms-vscode",
+  "publisher": "Chauncey",
   "engines": {
     "vscode": "^1.20.0"
   },
-  "enableProposedApi": true,
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [
     "onView:jsonOutline",
     "onLanguage:json",
