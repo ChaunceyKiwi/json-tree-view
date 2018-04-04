@@ -3,6 +3,7 @@ import * as json from 'jsonc-parser';
 import * as path from 'path';
 import { isNumber } from 'util';
 import { validate } from './schema-validator';
+import * as fs from 'fs';
 
 export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 
@@ -14,11 +15,13 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 	private editor: vscode.TextEditor;
 	private autoRefresh: boolean = true;
 	private error_paths: (string | number)[][];
+	private customized_view_mapping: { [key: string]: number } = undefined;
 
 	constructor(private context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => this.onActiveEditorChanged());
 		vscode.workspace.onDidChangeTextDocument(e => this.onDocumentChanged(e));
 		this.error_paths = this.validate();
+		this.loadCustomizedView();
 		this.parseTree();
 		this.autoRefresh = vscode.workspace.getConfiguration('jsonOutline').get('autorefresh');
 		vscode.workspace.onDidChangeConfiguration(() => {
@@ -102,6 +105,15 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 		if (this.editor && this.editor.document) {
 			this.text = this.editor.document.getText();
 			this.tree = json.parseTree(this.text);
+		}
+	}
+
+	private loadCustomizedView(): void {
+		let path = vscode.workspace.rootPath + "/config/customizedView.json";
+		let customizedViewConfig = fs.readFileSync(path, 'utf8');
+
+		if (IsJsonString(customizedViewConfig)) {
+			this.customized_view_mapping = JSON.parse(customizedViewConfig);
 		}
 	}
 
@@ -193,16 +205,23 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 
 	private getLabel(node: json.Node): string {
 		if (node.parent.type === 'array') {
-			let prefix = node.parent.parent.children[0].value.toString() + ' ' + node.parent.children.indexOf(node).toString();
+			let parentKey = node.parent.parent.children[0].value.toString();
 
-			if (node.type === 'object') {
-				return prefix + ' { }';
-			}
-			if (node.type === 'array') {
-				return prefix + ' [ ]';
-			}
+			if (this.customized_view_mapping !== undefined && parentKey in this.customized_view_mapping) {
+				let index: number = this.customized_view_mapping[parentKey];
+				return node.children[index].children[1].value + ' { }';
+			} else {
+				let prefix = parentKey + ' ' + node.parent.children.indexOf(node).toString();
 
-			return prefix + ': ' + node.value.toString();
+				if (node.type === 'object') {
+					return prefix + ' { }';
+				}
+				if (node.type === 'array') {
+					return prefix + ' [' + node.children.length + ']';
+				}
+
+				return prefix + ': ' + node.value.toString();
+			}
 		}
 		else {
 			const property = node.parent.children[0].value.toString();
@@ -235,4 +254,13 @@ function startWithOneOf(A: string, B: string[]) {
 	}
 	
 	return false;
+}
+
+function IsJsonString(str: string) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }
