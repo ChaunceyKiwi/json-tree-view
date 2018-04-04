@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as json from 'jsonc-parser';
 import * as path from 'path';
 import { isNumber } from 'util';
+import { validate } from './schema-validator';
 
 export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 
@@ -12,10 +13,12 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 	private text: string;
 	private editor: vscode.TextEditor;
 	private autoRefresh: boolean = true;
+	private error_paths: (string | number)[][];
 
 	constructor(private context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => this.onActiveEditorChanged());
 		vscode.workspace.onDidChangeTextDocument(e => this.onDocumentChanged(e));
+		this.error_paths = this.validate();
 		this.parseTree();
 		this.autoRefresh = vscode.workspace.getConfiguration('jsonOutline').get('autorefresh');
 		vscode.workspace.onDidChangeConfiguration(() => {
@@ -52,6 +55,18 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 					});
 				}
 			});
+	}
+
+	validate(): (string | number)[][] {
+		let error_paths_string = validate(JSON.parse(vscode.window.activeTextEditor.document.getText()));
+		let error_paths: (string | number)[][] = [];
+
+		for (let i = 0; i < error_paths_string.length; i++) {
+			let error_path = error_paths_string[i].split('.').slice(1);
+			error_paths.push(error_path);
+		}
+
+		return error_paths;
 	}
 
 	private onActiveEditorChanged(): void {
@@ -125,7 +140,16 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 				title: '',
 				arguments: [new vscode.Range(this.editor.document.positionAt(valueNode.offset), this.editor.document.positionAt(valueNode.offset + valueNode.length))]
 			};
-			treeItem.iconPath = this.getIcon(valueNode);
+
+			let flag = ifArrayAInArrayB(path, this.error_paths);
+			
+			/* If tree item's path is in error paths, assign it an error icon */
+			if (!flag) {
+				treeItem.iconPath = this.getIcon(valueNode);
+			} else {
+				treeItem.iconPath = this.getErrorIcon();
+			}
+
 			treeItem.contextValue = valueNode.type;
 			return treeItem;
 		}
@@ -160,6 +184,13 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 		return null;
 	}
 
+	private getErrorIcon(): any {
+		return {
+			light: this.context.asAbsolutePath(path.join('resources', 'light', 'error.svg')),
+			dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'error.svg'))
+		};
+	}
+
 	private getLabel(node: json.Node): string {
 		if (node.parent.type === 'array') {
 			let prefix = node.parent.parent.children[0].value.toString() + ' ' + node.parent.children.indexOf(node).toString();
@@ -170,6 +201,7 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 			if (node.type === 'array') {
 				return prefix + ' [ ]';
 			}
+
 			return prefix + ': ' + node.value.toString();
 		}
 		else {
@@ -186,4 +218,21 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 			return `${property}: ${value}`;
 		}
 	}
+}
+
+function ifArrayAInArrayB(A:(string | number)[], B:(string | number)[][]) {
+	let A_flatten = (A.map(x => x.toString())).join();
+	let B_flatten = B.map(x => x.join());
+
+	return startWithOneOf(A_flatten, B_flatten);
+}
+
+function startWithOneOf(A: string, B: string[]) {
+	for (let i = 0; i < B.length; i++) {
+		if (B[i].startsWith(A)) {
+			return true;
+		}
+	}
+	
+	return false;
 }
