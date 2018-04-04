@@ -170,6 +170,7 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 
 	select(range: vscode.Range) {
 		this.editor.selection = new vscode.Selection(range.start, range.end);
+		this.editor.revealRange(range);
 	}
 
 	private getIcon(node: json.Node): any {
