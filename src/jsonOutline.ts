@@ -15,7 +15,7 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 	private editor: vscode.TextEditor;
 	private autoRefresh: boolean = true;
 	private error_paths: (string | number)[][];
-	private customized_view_mapping: { [key: string]: number } = undefined;
+	private customized_view_mapping: { [key: string]: string } = undefined;
 
 	constructor(private context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => this.onActiveEditorChanged());
@@ -208,9 +208,16 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 			let parentKey = node.parent.parent.children[0].value.toString();
 
 			if (this.customized_view_mapping !== undefined && parentKey in this.customized_view_mapping) {
-				let index: number = this.customized_view_mapping[parentKey];
-				return node.children[index].children[1].value + ' { }';
-			} else {
+				let key: string = this.customized_view_mapping[parentKey];
+
+				for (let i = 0; i < node.children.length; i++) {
+					if (node.children[i].children[0].value === key) {
+						return node.children[i].children[1].value + ' { }';
+					}
+				} 
+			} 
+			
+			else {
 				let prefix = parentKey + ' ' + node.parent.children.indexOf(node).toString();
 
 				if (node.type === 'object') {
@@ -243,13 +250,26 @@ function ifArrayAInArrayB(A:(string | number)[], B:(string | number)[][]) {
 	let A_flatten = (A.map(x => x.toString())).join();
 	let B_flatten = B.map(x => x.join());
 
-	return startWithOneOf(A_flatten, B_flatten);
+	return withinOf(A_flatten, B_flatten);
 }
 
-function startWithOneOf(A: string, B: string[]) {
+function withinOf(A: string, B: string[]) {
 	for (let i = 0; i < B.length; i++) {
-		if (B[i].startsWith(A)) {
-			return true;
+		let A_array = A.split(',');
+		let B_sub_array = B[i].split(',');
+
+		/* return true if A_array is a sub array of B_sub_array */
+		if (A_array.length <= B_sub_array.length) {
+			let j;
+			for (j = 0; j < A_array.length; j++) {
+				if (A_array[j] !== B_sub_array[j]) {
+					break;
+				}
+			}
+
+			if (j === A_array.length) {
+				return true;
+			}
 		}
 	}
 	
