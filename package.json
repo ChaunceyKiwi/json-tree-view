@@ -49,6 +49,10 @@
         "title": "Reveal"
       },
       {
+        "command": "jsonOutline.revealNodeWithKey",
+        "title": "RevealWithKey"
+      },
+      {
         "command": "extension.openJsonSelection",
         "title": "Open JSON Selection"
       }
@@ -64,6 +68,10 @@
       "view/item/context": [
         {
           "command": "jsonOutline.revealNode",
+          "when": "view == jsonOutline"
+        },
+        {
+          "command": "jsonOutline.revealNodeWithKey",
           "when": "view == jsonOutline"
         }
       ]

@@ -75,6 +75,31 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 		vscode.window.showTextDocument(this.editor.document, this.editor.viewColumn, false);
 	}
 
+	revealWithKey(offset: number): void {
+		const path = json.getLocation(this.text, offset).path;
+		let propertyNode = json.findNodeAtLocation(this.tree, path);
+
+		let inverseOffset = 0;
+		if (propertyNode.parent.type !== 'array') {
+			let parentKeyLength = propertyNode.parent.children[0].value.length;
+			inverseOffset = parentKeyLength + 4; // including 2("), 1(:), and 1 space
+		}
+
+		const range = new vscode.Range(
+			this.editor.document.positionAt(propertyNode.offset - inverseOffset),
+			this.editor.document.positionAt(propertyNode.offset + propertyNode.length));
+			
+		this.editor.selection = new vscode.Selection(range.start, range.end);
+		
+		if (propertyNode.type !== 'object') {
+			// Center the method in the document
+			this.editor.revealRange(range);
+		}
+
+		// Swap the focus to the editor
+		vscode.window.showTextDocument(this.editor.document, this.editor.viewColumn, false);
+	}
+
 	validate(): (string | number)[][] {
 		let error_paths_string = validate(JSON.parse(vscode.window.activeTextEditor.document.getText()));
 		let error_paths: (string | number)[][] = [];
