@@ -45,6 +45,10 @@
         "title": "Rename"
       },
       {
+        "command": "jsonOutline.revealNode",
+        "title": "Reveal"
+      },
+      {
         "command": "extension.openJsonSelection",
         "title": "Open JSON Selection"
       }
@@ -59,13 +63,8 @@
       ],
       "view/item/context": [
         {
-          "command": "jsonOutline.renameNode",
+          "command": "jsonOutline.revealNode",
           "when": "view == jsonOutline"
-        },
-        {
-          "command": "jsonOutline.refreshNode",
-          "when": "view == jsonOutline",
-          "group": "inline"
         }
       ]
     },
@@ -76,6 +75,13 @@
           "jsonOutline.autorefresh": {
             "type": "boolean",
             "default": true
+          },
+          "jsonOutline.customizedViewActivated": {
+            "type": "boolean",
+            "default": true
+          },
+          "jsonOutline.customizedViewMapping": {
+            "type": "object"
           }
         }
       }

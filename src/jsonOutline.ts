@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as json from 'jsonc-parser';
 import * as path from 'path';
-import { isNumber } from 'util';
 import { validate } from './schema-validator';
 import * as fs from 'fs';
 
@@ -15,13 +14,11 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 	private editor: vscode.TextEditor;
 	private autoRefresh: boolean = true;
 	private error_paths: (string | number)[][];
-	private customized_view_mapping: { [key: string]: string } = undefined;
 
 	constructor(private context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => this.onActiveEditorChanged());
 		vscode.workspace.onDidChangeTextDocument(e => this.onDocumentChanged(e));
 		this.error_paths = this.validate();
-		this.loadCustomizedView();
 		this.parseTree();
 		this.autoRefresh = vscode.workspace.getConfiguration('jsonOutline').get('autorefresh');
 		vscode.workspace.onDidChangeConfiguration(() => {
@@ -49,7 +46,9 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 						if (propertyNode.parent.type !== 'array') {
 							propertyNode = propertyNode.parent.children[0];
 						}
-						const range = new vscode.Range(this.editor.document.positionAt(propertyNode.offset), this.editor.document.positionAt(propertyNode.offset + propertyNode.length));
+						const range = new vscode.Range(
+							this.editor.document.positionAt(propertyNode.offset),
+							this.editor.document.positionAt(propertyNode.offset + propertyNode.length));
 						editBuilder.replace(range, `"${value}"`);
 						setTimeout(() => {
 							this.parseTree();
@@ -58,6 +57,22 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 					});
 				}
 			});
+	}
+
+	reveal(offset: number): void {
+		const path = json.getLocation(this.text, offset).path;
+		let propertyNode = json.findNodeAtLocation(this.tree, path);
+		const range = new vscode.Range(
+			this.editor.document.positionAt(propertyNode.offset),
+			this.editor.document.positionAt(propertyNode.offset + propertyNode.length));
+			
+		this.editor.selection = new vscode.Selection(range.start, range.end);
+		
+		// Center the method in the document
+		this.editor.revealRange(range);
+
+		// Swap the focus to the editor
+		vscode.window.showTextDocument(this.editor.document, this.editor.viewColumn, false);
 	}
 
 	validate(): (string | number)[][] {
@@ -108,15 +123,6 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 		}
 	}
 
-	private loadCustomizedView(): void {
-		let path = vscode.workspace.rootPath + "/config/customizedView.json";
-		let customizedViewConfig = fs.readFileSync(path, 'utf8');
-
-		if (IsJsonString(customizedViewConfig)) {
-			this.customized_view_mapping = JSON.parse(customizedViewConfig);
-		}
-	}
-
 	getChildren(offset?: number): Thenable<number[]> {
 		if (offset) {
 			const path = json.getLocation(this.text, offset).path;
@@ -147,11 +153,14 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 			let treeItem: vscode.TreeItem = new vscode.TreeItem(
 				this.getLabel(valueNode),
 				hasChildren ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
-			treeItem.command = {
-				command: 'extension.openJsonSelection',
-				title: '',
-				arguments: [new vscode.Range(this.editor.document.positionAt(valueNode.offset), this.editor.document.positionAt(valueNode.offset + valueNode.length))]
-			};
+
+			if (!hasChildren) {
+				treeItem.command = {
+					command: 'extension.openJsonSelection',
+					title: '',
+					arguments: [new vscode.Range(this.editor.document.positionAt(valueNode.offset), this.editor.document.positionAt(valueNode.offset + valueNode.length))]
+				};	
+			}
 
 			let flag = ifArrayAInArrayB(path, this.error_paths);
 			
@@ -170,7 +179,12 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 
 	select(range: vscode.Range) {
 		this.editor.selection = new vscode.Selection(range.start, range.end);
-		this.editor.revealRange(range);
+		
+		// Center the method in the document
+		this.editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+
+		// Swap the focus to the editor
+		vscode.window.showTextDocument(this.editor.document, this.editor.viewColumn, false);
 	}
 
 	private getIcon(node: json.Node): any {
@@ -193,6 +207,13 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 				dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'number.svg'))
 			};
 		}
+
+		if (nodeType === 'object' || nodeType === 'array') {
+			return {
+				light: this.context.asAbsolutePath(path.join('resources', 'light', 'list.svg')),
+				dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'list.svg'))
+			};
+		}
 		
 		return null;
 	}
@@ -207,35 +228,38 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 	private getLabel(node: json.Node): string {
 		if (node.parent.type === 'array') {
 			let parentKey = node.parent.parent.children[0].value.toString();
+			let config = vscode.workspace.getConfiguration().jsonOutline;
 
-			if (this.customized_view_mapping !== undefined && parentKey in this.customized_view_mapping) {
-				let key: string = this.customized_view_mapping[parentKey];
+			if (config.customizedViewActivated &&
+				config.customizedViewMapping !== undefined &&
+				parentKey in config.customizedViewMapping) {
 
+				let key: string = config.customizedViewMapping[parentKey];
 				for (let i = 0; i < node.children.length; i++) {
 					if (node.children[i].children[0].value === key) {
-						return node.children[i].children[1].value + ' { }';
+						return node.children[i].children[1].value;
 					}
-				} 
-			} 
+				}
+			}
 			
 			else {
 				let prefix = parentKey + ' ' + node.parent.children.indexOf(node).toString();
 
 				if (node.type === 'object') {
-					return prefix + ' { }';
+					return prefix;
 				}
 				if (node.type === 'array') {
 					return prefix + ' [' + node.children.length + ']';
 				}
 
-				return prefix + ': ' + node.value.toString();
+				return node.value.toString();
 			}
 		}
 		else {
 			const property = node.parent.children[0].value.toString();
 			if (node.type === 'array' || node.type === 'object') {
 				if (node.type === 'object') {
-					return property + ' { }';
+					return property;
 				}
 				if (node.type === 'array') {
 					return property + ' [' + node.children.length + ']';
@@ -275,13 +299,4 @@ function withinOf(A: string, B: string[]) {
 	}
 	
 	return false;
-}
-
-function IsJsonString(str: string) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
 }
