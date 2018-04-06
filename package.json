@@ -1,9 +1,9 @@
 {
   "name": "json-tree-view",
   "displayName": "JSON Tree View",
-  "description": "Generate tree view from json file",
+  "description": "Generate a tree view from json file",
   "version": "0.0.1",
-  "publisher": "Chauncey",
+  "publisher": "ChaunceyKiwi",
   "engines": {
     "vscode": "^1.20.0"
   },
