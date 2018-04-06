@@ -8,7 +8,7 @@
     "vscode": "^1.20.0"
   },
   "activationEvents": [
-    "onView:jsonOutline",
+    "onView:jsonTreeView",
     "onLanguage:json",
     "onLanguage:jsonc"
   ],
@@ -17,15 +17,15 @@
     "views": {
       "explorer": [
         {
-          "id": "jsonOutline",
-          "name": "Json Outline",
-          "when": "jsonOutlineEnabled"
+          "id": "jsonTreeView",
+          "name": "Json Tree View",
+          "when": "jsonTreeViewEnabled"
         }
       ]
     },
     "commands": [
       {
-        "command": "jsonOutline.refresh",
+        "command": "jsonTreeView.refresh",
         "title": "Refresh",
         "icon": {
           "light": "resources/light/refresh.svg",
@@ -33,7 +33,7 @@
         }
       },
       {
-        "command": "jsonOutline.refreshNode",
+        "command": "jsonTreeView.refreshNode",
         "title": "Refresh",
         "icon": {
           "light": "resources/light/refresh.svg",
@@ -41,15 +41,15 @@
         }
       },
       {
-        "command": "jsonOutline.renameNode",
+        "command": "jsonTreeView.renameNode",
         "title": "Rename"
       },
       {
-        "command": "jsonOutline.revealNode",
+        "command": "jsonTreeView.revealNode",
         "title": "Reveal"
       },
       {
-        "command": "jsonOutline.revealNodeWithKey",
+        "command": "jsonTreeView.revealNodeWithKey",
         "title": "RevealWithKey"
       },
       {
@@ -60,35 +60,35 @@
     "menus": {
       "view/title": [
         {
-          "command": "jsonOutline.refresh",
-          "when": "view == jsonOutline",
+          "command": "jsonTreeView.refresh",
+          "when": "view == jsonTreeView",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "jsonOutline.revealNode",
-          "when": "view == jsonOutline"
+          "command": "jsonTreeView.revealNode",
+          "when": "view == jsonTreeView"
         },
         {
-          "command": "jsonOutline.revealNodeWithKey",
-          "when": "view == jsonOutline"
+          "command": "jsonTreeView.revealNodeWithKey",
+          "when": "view == jsonTreeView"
         }
       ]
     },
     "configuration": [
       {
-        "title": "JSON Outline",
+        "title": "JSON Tree View",
         "properties": {
-          "jsonOutline.autorefresh": {
+          "jsonTreeView.autorefresh": {
             "type": "boolean",
             "default": true
           },
-          "jsonOutline.customizedViewActivated": {
+          "jsonTreeView.customizedViewActivated": {
             "type": "boolean",
             "default": true
           },
-          "jsonOutline.customizedViewMapping": {
+          "jsonTreeView.customizedViewMapping": {
             "type": "object"
           }
         }

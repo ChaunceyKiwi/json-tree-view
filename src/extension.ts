@@ -2,20 +2,20 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { JsonOutlineProvider } from './jsonOutline';
+import { JsonTreeViewProvider } from './jsonTreeView';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    const jsonOutlineProvider = new JsonOutlineProvider(context);
+    const jsonTreeViewProvider = new JsonTreeViewProvider(context);
 
-    vscode.window.registerTreeDataProvider('jsonOutline', jsonOutlineProvider);
-	vscode.commands.registerCommand('jsonOutline.refresh', () => jsonOutlineProvider.refresh());
-	vscode.commands.registerCommand('jsonOutline.refreshNode', offset => jsonOutlineProvider.refresh(offset));
-	vscode.commands.registerCommand('jsonOutline.renameNode', offset => jsonOutlineProvider.rename(offset));
-	vscode.commands.registerCommand('jsonOutline.revealNode', offset => jsonOutlineProvider.reveal(offset));
-	vscode.commands.registerCommand('jsonOutline.revealNodeWithKey', offset => jsonOutlineProvider.revealWithKey(offset));
-	vscode.commands.registerCommand('extension.openJsonSelection', range => jsonOutlineProvider.select(range));
+    vscode.window.registerTreeDataProvider('jsonTreeView', jsonTreeViewProvider);
+	vscode.commands.registerCommand('jsonTreeView.refresh', () => jsonTreeViewProvider.refresh());
+	vscode.commands.registerCommand('jsonTreeView.refreshNode', offset => jsonTreeViewProvider.refresh(offset));
+	vscode.commands.registerCommand('jsonTreeView.renameNode', offset => jsonTreeViewProvider.rename(offset));
+	vscode.commands.registerCommand('jsonTreeView.revealNode', offset => jsonTreeViewProvider.reveal(offset));
+	vscode.commands.registerCommand('jsonTreeView.revealNodeWithKey', offset => jsonTreeViewProvider.revealWithKey(offset));
+	vscode.commands.registerCommand('extension.openJsonSelection', range => jsonTreeViewProvider.select(range));
 }
 
 // this method is called when your extension is deactivated

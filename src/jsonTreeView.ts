@@ -2,9 +2,8 @@ import * as vscode from 'vscode';
 import * as json from 'jsonc-parser';
 import * as path from 'path';
 import { validate } from './schema-validator';
-import * as fs from 'fs';
 
-export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
+export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<number | null> = new vscode.EventEmitter<number | null>();
 	readonly onDidChangeTreeData: vscode.Event<number | null> = this._onDidChangeTreeData.event;
@@ -20,9 +19,9 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 		vscode.workspace.onDidChangeTextDocument(e => this.onDocumentChanged(e));
 		this.error_paths = this.validate();
 		this.parseTree();
-		this.autoRefresh = vscode.workspace.getConfiguration('jsonOutline').get('autorefresh');
+		this.autoRefresh = vscode.workspace.getConfiguration('jsonTreeView').get('autorefresh');
 		vscode.workspace.onDidChangeConfiguration(() => {
-			this.autoRefresh = vscode.workspace.getConfiguration('jsonOutline').get('autorefresh');
+			this.autoRefresh = vscode.workspace.getConfiguration('jsonTreeView').get('autorefresh');
 		});
 		this.onActiveEditorChanged();
 	}
@@ -116,13 +115,13 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 		if (vscode.window.activeTextEditor) {
 			if (vscode.window.activeTextEditor.document.uri.scheme === 'file') {
 				const enabled = vscode.window.activeTextEditor.document.languageId === 'json' || vscode.window.activeTextEditor.document.languageId === 'jsonc';
-				vscode.commands.executeCommand('setContext', 'jsonOutlineEnabled', enabled);
+				vscode.commands.executeCommand('setContext', 'jsonTreeViewEnabled', enabled);
 				if (enabled) {
 					this.refresh();
 				}
 			}
 		} else {
-			vscode.commands.executeCommand('setContext', 'jsonOutlineEnabled', false);
+			vscode.commands.executeCommand('setContext', 'jsonTreeViewEnabled', false);
 		}
 	}
 
@@ -253,7 +252,7 @@ export class JsonOutlineProvider implements vscode.TreeDataProvider<number> {
 	private getLabel(node: json.Node): string {
 		if (node.parent.type === 'array') {
 			let parentKey = node.parent.parent.children[0].value.toString();
-			let config = vscode.workspace.getConfiguration().jsonOutline;
+			let config = vscode.workspace.getConfiguration().jsonTreeView;
 
 			if (config.customizedViewActivated &&
 				config.customizedViewMapping !== undefined &&
