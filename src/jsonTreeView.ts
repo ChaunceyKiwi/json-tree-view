@@ -261,7 +261,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 				let key: string = config.customizedViewMapping[parentKey];
 				for (let i = 0; i < node.children.length; i++) {
 					if (node.children[i].children[0].value === key) {
-						return node.children[i].children[1].value;
+						return node.children[i].children[1].value.toString();
 					}
 				}
 			}

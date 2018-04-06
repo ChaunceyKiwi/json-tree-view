@@ -3,14 +3,16 @@ var ajv = new Ajv({allErrors: true});
 import * as vscode from 'vscode';
 
 let schemaRead = false;
-let schemaFiles = [
-    vscode.workspace.rootPath + "/schema/schema-root.json",
-    vscode.workspace.rootPath + "/schema/schema-storedProcedure.json",
-    vscode.workspace.rootPath + "/schema/schema-table.json",
-    vscode.workspace.rootPath + "/schema/schema-sqltype.json"
-];
 
 export function validate(data: any) {
+
+    let jsonSchema = vscode.workspace.getConfiguration("json").schemas;
+    let schemaFiles: string[] = [];
+
+    for (let i = 0; i < jsonSchema.length; i++) {
+        schemaFiles.push(vscode.workspace.rootPath + jsonSchema[i].url);
+    }
+
     if (!schemaRead) {
         schemaFiles.forEach(function(schemaFile) {
             var schema = require(schemaFile);
