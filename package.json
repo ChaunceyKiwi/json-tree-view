@@ -112,5 +112,10 @@
   "dependencies": {
     "ajv": "^6.4.0",
     "jsonc-parser": "^0.4.2"
+  },
+  "license": "MIT",
+  "repository": {
+        "type": "git",
+        "url": "https://github.com/ChaunceyKiwi/json-schema-to-json-template"
   }
 }
