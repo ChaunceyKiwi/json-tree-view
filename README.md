@@ -1,15 +1,15 @@
 # JSON Tree View README
 
-A tool to generate a JSON tree view from a JSON file, integrated with JSON schema validation and customized tree view configuration.
+A tool to generate JSON tree view from JSON file, integrated with JSON schema validation and customized tree view configuration.
 
 ## Features
 1. JSON Tree View
 
 2. Validation Error Hightlighting
-![Validation Error Highlighting](./images/demo1.png)
+<img src="https://raw.githubusercontent.com/ChaunceyKiwi/json-tree-view/master/images/demo1.png" alt="alt text" height="1000px">
 
 3. Customized Tree View Configuration
-![Customized Tree View](./images/demo2.png)
+<img src="https://raw.githubusercontent.com/ChaunceyKiwi/json-tree-view/master/images/demo2.png" alt="alt text" height="1000px">
 
 ## Requirements
 
