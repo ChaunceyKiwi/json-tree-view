@@ -90,6 +90,10 @@
           },
           "jsonTreeView.customizedViewMapping": {
             "type": "object"
+          },
+          "jsonTreeView.highlightValidationError": {
+            "type": "boolean",
+            "default": false
           }
         }
       }

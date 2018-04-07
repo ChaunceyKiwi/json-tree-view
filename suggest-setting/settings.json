@@ -1,0 +1,15 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/*.json"
+            ],
+            "url": "/schema/schema-root.json"
+        }
+    ],
+    "jsonTreeView.customizedViewActivated": false,
+    "jsonTreeView.customizedViewMapping": {
+        "items": "id"
+    },
+    "jsonTreeView.highlightValidationError": false
+}

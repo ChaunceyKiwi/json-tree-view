@@ -17,7 +17,9 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 	constructor(private context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => this.onActiveEditorChanged());
 		vscode.workspace.onDidChangeTextDocument(e => this.onDocumentChanged(e));
-		this.error_paths = this.validate();
+		if (vscode.workspace.getConfiguration("jsonTreeView").highlightValidationError) {
+			this.error_paths = this.validate();
+		}
 		this.parseTree();
 		this.autoRefresh = vscode.workspace.getConfiguration('jsonTreeView').get('autorefresh');
 		vscode.workspace.onDidChangeConfiguration(() => {
@@ -186,13 +188,13 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 				};	
 			}
 
-			let flag = ifArrayAInArrayB(path, this.error_paths);
-			
 			/* If tree item's path is in error paths, assign it an error icon */
-			if (!flag) {
-				treeItem.iconPath = this.getIcon(valueNode);
+			if (vscode.workspace.getConfiguration("jsonTreeView").highlightValidationError) {
+				if(ifArrayAInArrayB(path, this.error_paths)) {
+					treeItem.iconPath = this.getErrorIcon();
+				}
 			} else {
-				treeItem.iconPath = this.getErrorIcon();
+				treeItem.iconPath = this.getIcon(valueNode);
 			}
 
 			treeItem.contextValue = valueNode.type;
