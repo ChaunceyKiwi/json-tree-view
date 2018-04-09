@@ -189,10 +189,8 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 			}
 
 			/* If tree item's path is in error paths, assign it an error icon */
-			if (vscode.workspace.getConfiguration("jsonTreeView").highlightValidationError) {
-				if(ifArrayAInArrayB(path, this.error_paths)) {
-					treeItem.iconPath = this.getErrorIcon();
-				}
+			if(vscode.workspace.getConfiguration("jsonTreeView").highlightValidationError && ifArrayAInArrayB(path, this.error_paths)) {
+				treeItem.iconPath = this.getErrorIcon();
 			} else {
 				treeItem.iconPath = this.getIcon(valueNode);
 			}
