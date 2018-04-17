@@ -17,9 +17,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 	constructor(private context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => this.onActiveEditorChanged());
 		vscode.workspace.onDidChangeTextDocument(e => this.onDocumentChanged(e));
-		if (vscode.workspace.getConfiguration("jsonTreeView").highlightValidationError) {
-			this.error_paths = this.validate();
-		}
+		this.updateValidationError();
 		this.parseTree();
 		this.autoRefresh = vscode.workspace.getConfiguration('jsonTreeView').get('autorefresh');
 		vscode.workspace.onDidChangeConfiguration(() => {
@@ -101,18 +99,6 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 		vscode.window.showTextDocument(this.editor.document, this.editor.viewColumn, false);
 	}
 
-	validate(): (string | number)[][] {
-		let error_paths_string = validate(JSON.parse(vscode.window.activeTextEditor.document.getText()));
-		let error_paths: (string | number)[][] = [];
-
-		for (let i = 0; i < error_paths_string.length; i++) {
-			let error_path = error_paths_string[i].split('.').slice(1);
-			error_paths.push(error_path);
-		}
-
-		return error_paths;
-	}
-
 	private onActiveEditorChanged(): void {
 		if (vscode.window.activeTextEditor) {
 			if (vscode.window.activeTextEditor.document.uri.scheme === 'file') {
@@ -120,6 +106,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 				vscode.commands.executeCommand('setContext', 'jsonTreeViewEnabled', enabled);
 				if (enabled) {
 					this.refresh();
+					this.updateValidationError();
 				}
 			}
 		} else {
@@ -291,6 +278,24 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 			}
 			const value = this.editor.document.getText(new vscode.Range(this.editor.document.positionAt(node.offset), this.editor.document.positionAt(node.offset + node.length)));
 			return `${property}: ${value}`;
+		}
+	}
+
+	validate(): (string | number)[][] {
+		let error_paths_string = validate(JSON.parse(vscode.window.activeTextEditor.document.getText()));
+		let error_paths: (string | number)[][] = [];
+
+		for (let i = 0; i < error_paths_string.length; i++) {
+			let error_path = error_paths_string[i].split('.').slice(1);
+			error_paths.push(error_path);
+		}
+
+		return error_paths;
+	}
+
+	private updateValidationError() {
+		if (vscode.workspace.getConfiguration("jsonTreeView").highlightValidationError) {
+			this.error_paths = this.validate();
 		}
 	}
 }

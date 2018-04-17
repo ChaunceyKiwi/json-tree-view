@@ -1,10 +1,8 @@
-var Ajv = require('ajv');
-var ajv = new Ajv({allErrors: true});
 import * as vscode from 'vscode';
 
-let schemaRead = false;
-
 export function validate(data: any) {
+    var Ajv = require('ajv');
+    var ajv = new Ajv({allErrors: true});
 
     let jsonSchema = vscode.workspace.getConfiguration("json").schemas;
     let schemaFiles: string[] = [];
@@ -13,13 +11,14 @@ export function validate(data: any) {
         schemaFiles.push(vscode.workspace.rootPath + jsonSchema[i].url);
     }
 
-    if (!schemaRead) {
-        schemaFiles.forEach(function(schemaFile) {
-            var schema = require(schemaFile);
-            ajv.addSchema(schema, schemaFile);
-        });
-        schemaRead = true;
+    if ("$schema" in data) {
+        schemaFiles.unshift(vscode.workspace.rootPath + data.$schema.slice(1));
     }
+
+    schemaFiles.forEach(function(schemaFile) {
+        var schema = require(schemaFile);
+        ajv.addSchema(schema, schemaFile);
+    });
 
     let valid = ajv.validate(schemaFiles[0], data);
     if (valid) {
