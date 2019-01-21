@@ -3,15 +3,12 @@
 A tool to generate JSON tree view from JSON file, integrated with JSON schema validation and customized tree view configuration.
 
 ## Features
-1. JSON Tree View
 
-2. Validation Error Hightlighting
+* JSON Tree View
+* Validation Error Hightlighting
+* Customized Tree View Configuration
 
-    <img src="https://raw.githubusercontent.com/ChaunceyKiwi/json-tree-view/master/images/demo1.png" alt="alt text" width="600px">
-
-3. Customized Tree View Configuration
-
-    <img src="https://raw.githubusercontent.com/ChaunceyKiwi/json-tree-view/master/images/demo2.png" alt="alt text" width="600px">
+<img src="./images/demo.png" width="600px">
 
 ## Requirements
 
