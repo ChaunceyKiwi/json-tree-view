@@ -8,7 +8,7 @@ A tool to generate JSON tree view from JSON file, integrated with JSON schema va
 * Validation Error Hightlighting
 * Customized Tree View Configuration
 
-<img src="./images/demo.png" width="600px">
+<img src="./images/demo.png" width="840px" height="480px">
 
 ## Requirements
 
