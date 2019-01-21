@@ -1,125 +1,120 @@
 {
-    "name": "json-tree-view",
-    "displayName": "JSON Tree View",
-    "description": "Generate a tree view from json file",
-    "version": "1.1.0",
-    "publisher": "ChaunceyKiwi",
-    "engines": {
-        "vscode": "^1.20.0"
+  "name": "json-tree-view",
+  "displayName": "JSON Tree View",
+  "description": "Generate a tree view from json file",
+  "version": "1.1.0",
+  "publisher": "ChaunceyKiwi",
+  "engines": {
+    "vscode": "^1.30.2"
+  },
+  "activationEvents": [
+    "onView:jsonTreeView",
+    "onLanguage:json",
+    "onLanguage:jsonc"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "jsonTreeView",
+          "name": "Json Tree View",
+          "when": "jsonTreeViewEnabled"
+        }
+      ]
     },
-    "activationEvents": [
-        "onView:jsonTreeView",
-        "onLanguage:json",
-        "onLanguage:jsonc"
+    "commands": [
+      {
+        "command": "jsonTreeView.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "jsonTreeView.refreshNode",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "jsonTreeView.renameNode",
+        "title": "Rename"
+      },
+      {
+        "command": "jsonTreeView.revealNode",
+        "title": "Reveal"
+      },
+      {
+        "command": "jsonTreeView.revealNodeWithKey",
+        "title": "RevealWithKey"
+      },
+      {
+        "command": "extension.openJsonSelection",
+        "title": "Open JSON Selection"
+      }
     ],
-    "main": "./out/extension",
-    "contributes": {
-        "views": {
-            "explorer": [
-                {
-                    "id": "jsonTreeView",
-                    "name": "Json Tree View",
-                    "when": "jsonTreeViewEnabled"
-                }
-            ]
+    "menus": {
+      "view/title": [
+        {
+          "command": "jsonTreeView.refresh",
+          "when": "view == jsonTreeView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "jsonTreeView.revealNode",
+          "when": "view == jsonTreeView"
         },
-        "commands": [
-            {
-                "command": "jsonTreeView.refresh",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
-            },
-            {
-                "command": "jsonTreeView.refreshNode",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
-            },
-            {
-                "command": "jsonTreeView.renameNode",
-                "title": "Rename"
-            },
-            {
-                "command": "jsonTreeView.revealNode",
-                "title": "Reveal"
-            },
-            {
-                "command": "jsonTreeView.revealNodeWithKey",
-                "title": "RevealWithKey"
-            },
-            {
-                "command": "extension.openJsonSelection",
-                "title": "Open JSON Selection"
-            }
-        ],
-        "menus": {
-            "view/title": [
-                {
-                    "command": "jsonTreeView.refresh",
-                    "when": "view == jsonTreeView",
-                    "group": "navigation"
-                }
-            ],
-            "view/item/context": [
-                {
-                    "command": "jsonTreeView.revealNode",
-                    "when": "view == jsonTreeView"
-                },
-                {
-                    "command": "jsonTreeView.revealNodeWithKey",
-                    "when": "view == jsonTreeView"
-                }
-            ]
-        },
-        "configuration": [
-            {
-                "title": "JSON Tree View",
-                "properties": {
-                    "jsonTreeView.autorefresh": {
-                        "type": "boolean",
-                        "default": true
-                    },
-                    "jsonTreeView.customizedViewActivated": {
-                        "type": "boolean",
-                        "default": true
-                    },
-                    "jsonTreeView.customizedViewMapping": {
-                        "type": "object"
-                    },
-                    "jsonTreeView.highlightValidationError": {
-                        "type": "boolean",
-                        "default": false
-                    }
-                }
-            }
-        ]
+        {
+          "command": "jsonTreeView.revealNodeWithKey",
+          "when": "view == jsonTreeView"
+        }
+      ]
     },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "tslint": "^5.8.0",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
-    },
-    "dependencies": {
-        "ajv": "^6.4.0",
-        "jsonc-parser": "^0.4.2"
-    },
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/ChaunceyKiwi/json-schema-to-json-template"
-    }
+    "configuration": [
+      {
+        "title": "JSON Tree View",
+        "properties": {
+          "jsonTreeView.autorefresh": {
+            "type": "boolean",
+            "default": true
+          },
+          "jsonTreeView.customizedViewActivated": {
+            "type": "boolean",
+            "default": true
+          },
+          "jsonTreeView.customizedViewMapping": {
+            "type": "object"
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.6.1",
+    "vscode": "1.1.26",
+    "tslint": "^5.8.0",
+    "@types/node": "^7.0.43",
+    "@types/mocha": "^2.2.42"
+  },
+  "dependencies": {
+    "jsonc-parser": "^0.4.2"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChaunceyKiwi/json-schema-to-json-template"
+  }
 }
