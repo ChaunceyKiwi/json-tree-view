@@ -10,7 +10,7 @@ A tool to generate JSON tree view from JSON file, integrated with JSON schema va
 
 <img src="https://raw.githubusercontent.com/ChaunceyKiwi/json-tree-view/master/images/demo.png" width="840px" height="480px">
 
-## Requirements
+## How to run
 
 1. Follow instructions on `https://code.visualstudio.com/docs/languages/json` to set up json schema files.
 2. To enable customized tree view, in user setting you need to specify the key of the object you want to customize and speicify which children's key you want to use as identifier. E.g. 
@@ -23,6 +23,9 @@ A tool to generate JSON tree view from JSON file, integrated with JSON schema va
         }
     }
     ```
+
+## Quick Demo
+Open folder `./demo` in Visual Studio Code, and open file `target.json` in text editor, you will find errors are highlighted.
 
 ## Release Notes
 
