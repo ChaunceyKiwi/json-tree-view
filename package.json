@@ -115,6 +115,6 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ChaunceyKiwi/json-schema-to-json-template"
+        "url": "https://github.com/ChaunceyKiwi/json-tree-view"
     }
 }
