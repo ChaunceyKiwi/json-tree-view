@@ -9,11 +9,11 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
   readonly onDidChangeTreeData: vscode.Event<number | null> = this
     ._onDidChangeTreeData.event;
 
-  private tree: json.Node;
-  private text: string;
-  private editor: vscode.TextEditor;
+  private tree!: json.Node;
+  private text!: string;
+  private editor!: vscode.TextEditor;
   private autoRefresh: boolean = true;
-  private error_paths: (string | number)[][];
+  private error_paths!: (string | number)[][];
 
   constructor(private context: vscode.ExtensionContext) {
     vscode.window.onDidChangeActiveTextEditor(() =>
@@ -24,7 +24,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     vscode.workspace.onDidChangeConfiguration(() => {
       this.autoRefresh = vscode.workspace
         .getConfiguration("jsonTreeView")
-        .get("autorefresh");
+        .get("autorefresh") ?? false;
     });
     this.onActiveEditorChanged();
   }
@@ -35,13 +35,18 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     if (offset) {
       this._onDidChangeTreeData.fire(offset);
     } else {
-      this._onDidChangeTreeData.fire();
+      this._onDidChangeTreeData.fire(null);
     }
   }
 
   reveal(offset: number): void {
     const path = json.getLocation(this.text, offset).path;
     let propertyNode = json.findNodeAtLocation(this.tree, path);
+
+    if (!propertyNode) {
+      return
+    }
+
     const range = new vscode.Range(
       this.editor.document.positionAt(propertyNode.offset),
       this.editor.document.positionAt(propertyNode.offset + propertyNode.length)
@@ -64,8 +69,12 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     const path = json.getLocation(this.text, offset).path;
     let propertyNode = json.findNodeAtLocation(this.tree, path);
 
+    if (!propertyNode) {
+      return;
+    }
+
     let inverseOffset = 0;
-    if (propertyNode.parent.type !== "array") {
+    if (propertyNode.parent && propertyNode.parent.children && propertyNode.parent.type !== "array") {
       let parentKeyLength = propertyNode.parent.children[0].value.length;
       inverseOffset = parentKeyLength + 4; // including 2("), 1(:), and 1 space
     }
@@ -130,7 +139,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
           ? json.findNodeAtLocation(this.tree, path)
           : void 0;
         this.parseTree();
-        this._onDidChangeTreeData.fire(node ? node.offset : void 0);
+        this._onDidChangeTreeData.fire(node ? node.offset : null);
       }
     }
   }
@@ -141,11 +150,10 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 
   private parseTree(): void {
     this.text = "";
-    this.tree = null;
-    this.editor = vscode.window.activeTextEditor;
+    this.editor = vscode.window.activeTextEditor!;
     if (this.editor && this.editor.document) {
       this.text = this.editor.document.getText();
-      this.tree = json.parseTree(this.text);
+      this.tree = json.parseTree(this.text)!;
     }
   }
 
@@ -153,7 +161,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     if (offset) {
       const path = json.getLocation(this.text, offset).path;
       const node = json.findNodeAtLocation(this.tree, path);
-      return Promise.resolve(this.getChildrenOffsets(node));
+      return Promise.resolve(this.getChildrenOffsets(node!));
     } else {
       return Promise.resolve(
         this.tree ? this.getChildrenOffsets(this.tree) : []
@@ -163,7 +171,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 
   private getChildrenOffsets(node: json.Node): number[] {
     const offsets: number[] = [];
-    for (const child of node.children) {
+    for (const child of node.children!) {
       const childPath = json.getLocation(this.text, child.offset).path;
       const childNode = json.findNodeAtLocation(this.tree, childPath);
       if (childNode) {
@@ -211,7 +219,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
       treeItem.contextValue = valueNode.type;
       return treeItem;
     }
-    return null;
+    return null!;
   }
 
   select(range: vscode.Range) {
@@ -287,42 +295,41 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
   }
 
   private getLabel(node: json.Node): string {
-    if (node.parent.type === "array") {
-      let parentKey = node.parent.parent.children[0].value.toString();
+    if (node.parent!.type === "array") {
+      let parentKey = node!.parent!.parent ? node!.parent!.parent.children![0].value.toString() : "";
       let config = vscode.workspace.getConfiguration().jsonTreeView;
-
       if (
         config.customizedViewActivated &&
         config.customizedViewMapping !== undefined &&
         parentKey in config.customizedViewMapping
       ) {
         let key: string = config.customizedViewMapping[parentKey];
-        for (let i = 0; i < node.children.length; i++) {
-          if (node.children[i].children[0].value === key) {
-            return node.children[i].children[1].value.toString();
+        for (let i = 0; i < node.children!.length; i++) {
+          if (node!.children![i].children![0].value === key) {
+            return node!.children![i].children![1].value.toString();
           }
         }
       } else {
         let prefix =
-          parentKey + " " + node.parent.children.indexOf(node).toString();
+          parentKey + " " + node.parent!.children!.indexOf(node).toString();
 
         if (node.type === "object") {
           return prefix;
         }
         if (node.type === "array") {
-          return prefix + " [" + node.children.length + "]";
+          return prefix + " [" + node.children!.length + "]";
         }
 
         return node.value.toString();
       }
     } else {
-      const property = node.parent.children[0].value.toString();
+      const property = node.parent!.children![0].value.toString();
       if (node.type === "array" || node.type === "object") {
         if (node.type === "object") {
           return property;
         }
         if (node.type === "array") {
-          return property + " [" + node.children.length + "]";
+          return property + " [" + node.children!.length + "]";
         }
       }
       const value = this.editor.document.getText(
@@ -333,6 +340,8 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
       );
       return `${property}: ${value}`;
     }
+
+    return "";
   }
 
   private updateErrorPath() {
@@ -342,13 +351,13 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     for (let i = 0; i < diagnostics.length; i++) {
       if (
         diagnostics[i][0]["fsPath"] ===
-        vscode.window.activeTextEditor.document.fileName
+        vscode.window.activeTextEditor!.document.fileName
       ) {
         let error = diagnostics[i][1];
         this.error_paths = error.map(
           (x: any) =>
             json.getLocation(
-              vscode.window.activeTextEditor.document.getText(),
+              vscode.window.activeTextEditor!.document.getText(),
               this.editor.document.offsetAt(x["range"]["end"])
             ).path
         );
