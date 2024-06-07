@@ -60,14 +60,12 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
       let propertyNode = json.findNodeAtLocation(this.tree, path);
 
       if (propertyNode) {
-        let inverseOffset = 0;
-        if (propertyNode.parent.type !== 'array') {
-          let parentKeyLength = propertyNode.parent.children[0].value.length;
-          inverseOffset = parentKeyLength + 4; // including 2("), 1(:), and 1 space
+        let startOffset = undefined;
+        if (propertyNode.parent?.type === 'property' && propertyNode.parent.children) {
+          startOffset = propertyNode.parent.children[0].offset;
         }
-
         const range = new vscode.Range(
-          this.editor.document.positionAt(propertyNode.offset - inverseOffset),
+          this.editor.document.positionAt(startOffset ?? propertyNode.offset),
           this.editor.document.positionAt(propertyNode.offset + propertyNode.length)
         );
 
