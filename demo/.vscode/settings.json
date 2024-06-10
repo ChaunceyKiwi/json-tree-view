@@ -7,7 +7,6 @@
       "url": "/schema/schema.json"
     }
   ],
-  "jsonTreeView.customizedViewActivated": true,
   "jsonTreeView.customizedViewMapping": {
     "items": "id"
   }

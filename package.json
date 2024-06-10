@@ -28,69 +28,55 @@
     },
     "commands": [
       {
-        "command": "jsonTreeView.refresh",
-        "title": "Refresh",
+        "command": "jsonTreeView.collapseAll",
+        "title": "Collapse All",
         "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
+          "light": "resources/light/collapse-all.svg",
+          "dark": "resources/dark/collapse-all.svg"
         }
       },
       {
-        "command": "jsonTreeView.refreshNode",
-        "title": "Refresh",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
-      },
-      {
-        "command": "jsonTreeView.renameNode",
-        "title": "Rename"
-      },
-      {
-        "command": "jsonTreeView.revealNode",
+        "command": "jsonTreeView.reveal",
         "title": "Reveal"
       },
       {
-        "command": "jsonTreeView.revealNodeWithKey",
-        "title": "RevealWithKey"
+        "command": "jsonTreeView.revealWithKey",
+        "title": "Reveal with Key"
       },
       {
-        "command": "extension.openJsonSelection",
-        "title": "Open JSON Selection"
+        "command": "jsonTreeView.revealInTree",
+        "title": "Reveal in Tree"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "jsonTreeView.refresh",
+          "command": "jsonTreeView.collapseAll",
           "when": "view == jsonTreeView",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "jsonTreeView.revealNode",
+          "command": "jsonTreeView.reveal",
           "when": "view == jsonTreeView"
         },
         {
-          "command": "jsonTreeView.revealNodeWithKey",
+          "command": "jsonTreeView.revealWithKey",
           "when": "view == jsonTreeView"
         }
-      ]
+      ],
+      "editor/context": [
+        {
+            "command": "jsonTreeView.revealInTree",
+            "when": "editorTextFocus"
+        }
+    ]
     },
     "configuration": [
       {
         "title": "JSON Tree View",
         "properties": {
-          "jsonTreeView.autorefresh": {
-            "type": "boolean",
-            "default": true
-          },
-          "jsonTreeView.customizedViewActivated": {
-            "type": "boolean",
-            "default": true
-          },
           "jsonTreeView.customizedViewMapping": {
             "type": "object"
           }
