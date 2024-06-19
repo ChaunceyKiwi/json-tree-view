@@ -42,9 +42,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
           this.editor.document.positionAt(propertyNode.offset + propertyNode.length)
         );
         this.editor.selection = new vscode.Selection(range.start, range.end);
-        if (propertyNode.type !== 'object') {
-          this.editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-        }
+        this.editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
         vscode.window.showTextDocument(this.editor.document, this.editor.viewColumn, false);
       }
     }
@@ -215,54 +213,55 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
   }
 
   private getLabel(node: json.Node): string {
-    const config = vscode.workspace.getConfiguration().jsonTreeView;
-
-    if (node.parent?.type === 'array') {
-      const prefix = node.parent.children?.indexOf(node).toString();
-      if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
-        const parentKey = node.parent.parent.children[0].value.toString();
-
-        /* If customized mapping enabled */
-        if (
-          config.customizedViewMapping &&
-          parentKey in config.customizedViewMapping &&
-          node.type === 'object' &&
-          node.children
-        ) {
-          let key: string = config.customizedViewMapping[parentKey];
-          for (let i = 0; i < node.children.length; i++) {
-            const childNode = node.children[i];
-            if (childNode.children && childNode.children[0].value === key) {
-              return childNode.children[1].value.toString();
+    if (node.type === 'object') {
+      if (node.parent?.type === 'property') {
+        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
+        return property + ' { }';
+      } else if (node.parent?.type === 'array') {
+        if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
+          /* If parent key is available */
+          const parentKey = node.parent.parent.children[0].value.toString();
+          const config = vscode.workspace.getConfiguration().jsonTreeView;
+          if (
+            config.customizedViewMapping &&
+            parentKey in config.customizedViewMapping &&
+            node.type === 'object' &&
+            node.children
+          ) {
+            /* Object in array is the only case where customized mapping can be applied */
+            let key: string = config.customizedViewMapping[parentKey];
+            for (let i = 0; i < node.children.length; i++) {
+              const childNode = node.children[i];
+              if (childNode.children && childNode.children[0].value === key) {
+                return childNode.children[1].value.toString();
+              }
             }
           }
+          const prefix = node.parent.children?.indexOf(node).toString();
+          return pluralize.singular(parentKey) + ' ' + prefix + ' { }';
         }
-
-        return pluralize.singular(parentKey) + ' ' + prefix;
       }
-      if (node.type === 'object') {
-        return prefix + ' { }';
+    } else if (node.type === 'array') {
+      if (node.parent?.type === 'property') {
+        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
+        return property + ' [' + node.children!.length + ']';
+      } else if (node.parent?.type === 'array') {
+        const prefix = node.parent.children?.indexOf(node).toString();
+        if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
+          /* If parent key is available */
+          const parentKey = node.parent.parent.children[0].value.toString();
+          return pluralize.singular(parentKey) + ' ' + prefix + ' [' + node.children!.length + ']';
+        } else {
+          /* If parent key is not available */
+          return prefix + ' [' + node.children!.length + ']';
+        }
       }
-      if (node.type === 'array' && node.children?.length) {
-        return prefix + ' [' + node.children.length + ']';
-      }
-      return prefix + ': ' + node.value.toString();
     } else {
       const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
-      if (node.type === 'object') {
-        return property + ' { }';
-      }
-      if (node.type === 'array') {
-        return property + ' [' + node.children?.length + ']';
-      }
-      const value = this.editor?.document.getText(
-        new vscode.Range(
-          this.editor.document.positionAt(node.offset),
-          this.editor.document.positionAt(node.offset + node.length)
-        )
-      );
+      const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
       return `${property}: ${value}`;
     }
+    return 'undefined';
   }
 
   private updateErrorPath() {
