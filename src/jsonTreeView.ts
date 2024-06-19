@@ -257,9 +257,14 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
         }
       }
     } else {
-      const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
-      const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
-      return `${property}: ${value}`;
+      if (node.parent?.type === 'array') {
+        const prefix = node.parent.children?.indexOf(node).toString();
+        return prefix + ': ' + node.value.toString();
+      } else {
+        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
+        const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
+        return `${property}: ${value}`;
+      }
     }
     return 'undefined';
   }
