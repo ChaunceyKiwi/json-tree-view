@@ -212,6 +212,11 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     };
   }
 
+  /**
+   * Key observations:
+   *   1. node.type could only be 'object', 'array', 'string', 'number', 'boolean'
+   *   2. 'object' node has 0 or many property node as children. Parent node can only be 'array' or 'object
+   */
   private getLabel(node: json.Node): string {
     if (node.type === 'object') {
       if (node.parent?.type === 'property') {
@@ -257,7 +262,12 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
         }
       }
     } else {
-      if (node.parent?.type === 'array') {
+      /* Primitive node type: 'string', 'number', 'boolean' */
+      if (node.parent?.type === 'property') {
+        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
+        const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
+        return `${property}: ${value}`;
+      } else if (node.parent?.type === 'array') {
         const prefix = node.parent.children?.indexOf(node).toString();
         if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
           /* If parent key is available */
@@ -267,10 +277,6 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
           /* If parent key is not available */
           return prefix + ': ' + node.value.toString();
         }
-      } else {
-        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
-        const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
-        return `${property}: ${value}`;
       }
     }
     return 'undefined';
