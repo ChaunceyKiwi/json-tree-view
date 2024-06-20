@@ -259,7 +259,14 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     } else {
       if (node.parent?.type === 'array') {
         const prefix = node.parent.children?.indexOf(node).toString();
-        return prefix + ': ' + node.value.toString();
+        if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
+          /* If parent key is available */
+          const parentKey = node.parent.parent.children[0].value.toString();
+          return pluralize.singular(parentKey) + ' ' + prefix + ': ' + node.value.toString();
+        } else {
+          /* If parent key is not available */
+          return prefix + ': ' + node.value.toString();
+        }
       } else {
         const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
         const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
