@@ -3,7 +3,7 @@
   "displayName": "JSON Tree View",
   "description": "Generate a tree view from json file",
   "icon": "images/icon.png",
-  "version": "3.2.4",
+  "version": "3.6.0",
   "publisher": "ChaunceyKiwi",
   "engines": {
     "vscode": "^1.89.0"
