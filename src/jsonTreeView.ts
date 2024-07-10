@@ -244,6 +244,8 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
           }
           const prefix = node.parent.children?.indexOf(node).toString();
           return pluralize.singular(parentKey) + ' ' + prefix + ' { }';
+        } else if (node.parent.children) {
+          return node.parent.children?.indexOf(node).toString();
         }
       }
     } else if (node.type === 'array') {
