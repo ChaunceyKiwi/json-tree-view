@@ -28,6 +28,14 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     }
   }
 
+  select(range: vscode.Range) {
+    const config = vscode.workspace.getConfiguration().jsonTreeView;
+    if (config.revealOnClick && this.editor) {
+      this.editor.selection = new vscode.Selection(range.start, range.end);
+      this.editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+    }
+  }
+
   reveal(offset: number, withKey: boolean): void {
     if (this.tree && this.editor) {
       const path = json.getLocation(this.text, offset).path;
@@ -168,6 +176,17 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
       } else {
         treeItem.iconPath = this.getIcon(valueNode);
       }
+
+      treeItem.command = {
+        command: 'extension.openJsonSelection',
+        title: 'Open JSON Selection',
+        arguments: [
+          new vscode.Range(
+            this.editor.document.positionAt(valueNode.offset),
+            this.editor.document.positionAt(valueNode.offset + valueNode.length)
+          ),
+        ],
+      };
 
       treeItem.contextValue = valueNode.type;
       return treeItem;

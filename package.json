@@ -3,7 +3,7 @@
   "displayName": "JSON Tree View",
   "description": "Generate a tree view from json file",
   "icon": "images/icon.png",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "publisher": "ChaunceyKiwi",
   "engines": {
     "vscode": "^1.89.0"
@@ -77,6 +77,11 @@
       {
         "title": "JSON Tree View",
         "properties": {
+          "jsonTreeView.revealOnClick": {
+            "type":"boolean",
+            "default": true,
+            "description": "Enable reveal on click"
+          },
           "jsonTreeView.customizedViewMapping": {
             "type": "object"
           }

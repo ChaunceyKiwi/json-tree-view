@@ -44,5 +44,17 @@ Add `Reveal in Tree` to highlight tree node from text editor.
 
 <img src="./images/demo.gif" width="720px" height="500px">
 
+### 3.6.2
+
+As requested by users, clicking on a tree view item now reveals and jumps to the corresponding JSON position. 
+
+<img src="./images/reveal-demo.gif" width="720px">
+
+#### How to disable
+
+You can disable it in Settings by unchecking `Reveal On Click`.
+
+<img src="./images/reveal.png" width="240px">
+
 ## Others
 * For more information, feel free to raise new issues on [Github Repository JSON Tree View](https://github.com/ChaunceyKiwi/json-tree-view)

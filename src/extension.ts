@@ -10,6 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('jsonTreeView.reveal', (offset) => jsonTreeViewProvider.reveal(offset, false));
   vscode.commands.registerCommand('jsonTreeView.revealWithKey', (offset) => jsonTreeViewProvider.reveal(offset, true));
   vscode.commands.registerCommand('jsonTreeView.revealInTree', () => jsonTreeViewProvider.revealInTree(treeView));
+  vscode.commands.registerCommand('extension.openJsonSelection', (range) => jsonTreeViewProvider.select(range));
   vscode.languages.onDidChangeDiagnostics(() => jsonTreeViewProvider.refresh());
 }
 
