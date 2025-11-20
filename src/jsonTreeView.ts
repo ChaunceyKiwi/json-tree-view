@@ -86,7 +86,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
   }
 
   private onDocumentChanged(changeEvent: vscode.TextDocumentChangeEvent): void {
-    if (this.tree && changeEvent.document.uri.toString() === this.editor?.document.uri.toString()) {
+    if (this.tree && changeEvent.document.uri === this.editor?.document.uri) {
       for (const change of changeEvent.contentChanges) {
         const path = json.getLocation(this.text, this.editor.document.offsetAt(change.range.start)).path;
         path.pop();
@@ -221,6 +221,14 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
         dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'list.svg')),
       };
     }
+
+    if (nodeType === 'null') {
+      return {
+        light: this.context.asAbsolutePath(path.join('resources', 'light', 'null.svg')),
+        dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'null.svg')),
+      };
+    }
+
     return null;
   }
 
@@ -239,12 +247,12 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
   private getLabel(node: json.Node): string {
     if (node.type === 'object') {
       if (node.parent?.type === 'property') {
-        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
+        const property = node.parent?.children ? node.parent.children[0].value : '';
         return property + ' { }';
       } else if (node.parent?.type === 'array') {
         if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
           /* If parent key is available */
-          const parentKey = node.parent.parent.children[0].value.toString();
+          const parentKey = node.parent.parent.children[0].value;
           const config = vscode.workspace.getConfiguration().jsonTreeView;
           if (
             config.customizedViewMapping &&
@@ -257,11 +265,11 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
             for (let i = 0; i < node.children.length; i++) {
               const childNode = node.children[i];
               if (childNode.children && childNode.children[0].value === key) {
-                return childNode.children[1].value.toString();
+                return childNode.children[1].value;
               }
             }
           }
-          const prefix = node.parent.children?.indexOf(node).toString();
+          const prefix = node.parent.children?.indexOf(node);
           return pluralize.singular(parentKey) + ' ' + prefix + ' { }';
         } else if (node.parent.children) {
           return node.parent.children?.indexOf(node).toString();
@@ -269,13 +277,13 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
       }
     } else if (node.type === 'array') {
       if (node.parent?.type === 'property') {
-        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
+        const property = node.parent?.children ? node.parent.children[0].value : '';
         return property + ' [' + node.children!.length + ']';
       } else if (node.parent?.type === 'array') {
-        const prefix = node.parent.children?.indexOf(node).toString();
+        const prefix = node.parent.children?.indexOf(node);
         if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
           /* If parent key is available */
-          const parentKey = node.parent.parent.children[0].value.toString();
+          const parentKey = node.parent.parent.children[0].value;
           return pluralize.singular(parentKey) + ' ' + prefix + ' [' + node.children!.length + ']';
         } else {
           /* If parent key is not available */
@@ -285,18 +293,18 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
     } else {
       /* Primitive node type: 'string', 'number', 'boolean' */
       if (node.parent?.type === 'property') {
-        const property = node.parent?.children ? node.parent.children[0].value.toString() : '';
-        const value = node.parent?.children ? node.parent.children[1].value.toString() : '';
+        const property = node.parent?.children ? node.parent.children[0].value : '';
+        const value = node.parent?.children ? node.parent.children[1].value : '';
         return `${property}: ${value}`;
       } else if (node.parent?.type === 'array') {
-        const prefix = node.parent.children?.indexOf(node).toString();
+        const prefix = node.parent.children?.indexOf(node);
         if (node.parent.parent?.type === 'property' && node.parent.parent?.children) {
           /* If parent key is available */
-          const parentKey = node.parent.parent.children[0].value.toString();
-          return pluralize.singular(parentKey) + ' ' + prefix + ': ' + node.value.toString();
+          const parentKey = node.parent.parent.children[0].value;
+          return pluralize.singular(parentKey) + ' ' + prefix + ': ' + node.value;
         } else {
           /* If parent key is not available */
-          return prefix + ': ' + node.value.toString();
+          return prefix + ': ' + node.value;
         }
       }
     }
@@ -325,7 +333,7 @@ export class JsonTreeViewProvider implements vscode.TreeDataProvider<number> {
 }
 
 function ifArrayAInArrayB(A: (string | number)[], B: (string | number)[][]) {
-  let A_flatten = A.map((x) => x.toString()).join();
+  let A_flatten = A.map((x) => x).join();
   let B_flatten = B.map((x) => x.join());
   return withinOf(A_flatten, B_flatten);
 }
